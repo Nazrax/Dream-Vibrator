@@ -8,6 +8,8 @@
 
 #include <util/delay.h>
 
+#define TICKS_PER_SECOND 61
+
 #define QUARTERSEC _BV(WDP2)
 #define HALFSEC (_BV(WDP2) | _BV(WDP0))
 #define TWOSECS (_BV(WDP2) | _BV(WDP1) | _BV(WDP0))
@@ -42,17 +44,18 @@ bool_t active;
 
 void slow_timer() {
   timer = SLOW;
- 
+  TCCR1 = 0; // stop timer1
 }
 
 void fast_timer() {
   timer = FAST;
   wdt_stop();
 
+  TCNT1 = 0;
   TIMSK |= _BV(OCIE1A);
-  TCCR1 = _BV(CTC1) | _BV(CS13) | _BV(CS12); // CTC mode; CLK / 2048 = 61 ticks/sec
-  OCR1A = 61;
-  OCR1C = 61;
+  TCCR1 = _BV(CTC1) | _BV(CS13) | _BV(CS11) | _BV(CS10); // CTC mode; CLK / 1024 = 122 ticks/sec
+  OCR1A = 1; // Fire interrupt 61 times / second
+  OCR1C = 1; // CTC resets timer at the same time interrupt fires
 }
 
 inline void wdt_sleep(int mask) {
@@ -195,6 +198,8 @@ ISR(INT0_vect) {
 
 
 ISR(TIMER1_COMPA_vect) {
-  PORTB ^= _BV(PORTB0);
+  counter++;
+  if (counter % TICKS_PER_SECOND == 0) 
+    PORTB ^= _BV(PORTB0);
 }
 
