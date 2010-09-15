@@ -96,7 +96,7 @@ void update_button(button_t *button, uint8_t pin) {
   button_state_t state = !(PINB & _BV(pin));
 
   if (state != button->current) {
-    if (button->time + 2 < counter) {
+    if (button->time + 4 < counter) {
       button->old = button->current;
       button->current = state;
       button->time = counter;
@@ -128,8 +128,6 @@ int main(void) {
   sei();
 
   fast_timer();
-  for(;;) {
-  }
 
   for(;;) {
     update_button(&button1, PINB2);
@@ -190,7 +188,7 @@ int main(void) {
 }
 
 ISR(WDT_vect) {
-  counter++;
+  counter += TICKS_PER_SECOND * 8;
 }
 
 ISR(INT0_vect) {
@@ -199,7 +197,5 @@ ISR(INT0_vect) {
 
 ISR(TIMER1_COMPA_vect) {
   counter++;
-  if (counter % TICKS_PER_SECOND == 0) 
-    PORTB ^= _BV(PORTB0);
 }
 
