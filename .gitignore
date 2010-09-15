@@ -1,0 +1,7 @@
+*.o
+*.d
+*.lst
+*.hex
+*.out
+*.map
+.emacs
