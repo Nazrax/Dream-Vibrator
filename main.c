@@ -1,29 +1,37 @@
 #include "vibrator.h"
 
+#define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 15)
+#define DAY_DURATION (TICKS_PER_SECOND / 4)
+#define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5)
+#define DILD_DURATION TICKS_PER_SECOND
+#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 10)
+#define WILD_FREQUENCY (TICKS_PER_SECOND * 45)
+#define WILD_DURATION (TICKS_PER_SECOND / 4)
+
 inline void switch_to_day() {
   mode = DAY;
-  mode_time = counter + TICKS_PER_SECOND * 60 * 15;
+  mode_time = counter + DAY_FREQUENCY;
   off_time = counter + TICKS_PER_SECOND / 2;
   turn_on();
 }
 
 inline void switch_to_dild() {
   mode = DILD_WAITING;
-  mode_time = counter + TICKS_PER_SECOND * 60 * 60 * 5;
+  mode_time = counter + DILD_DELAY;
   off_time = counter + TICKS_PER_SECOND;
   turn_on();
 }
 
 inline void switch_to_wild() {
   mode = WILD;
-  mode_time = counter + TICKS_PER_SECOND * 45;
+  mode_time = counter + WILD_FREQUENCY;
   off_time = counter + TICKS_PER_SECOND * 2;
   turn_on();
 }
 
 inline void alarm_day() {
   switch_to_day();
-  off_time = counter + TICKS_PER_SECOND / 4;
+  off_time = counter + DAY_DURATION;
   turn_on();
 }
 
@@ -33,14 +41,14 @@ inline void alarm_dild_waiting() {
 }
 
 inline void alarm_dild_active() {
-  mode_time = counter + TICKS_PER_SECOND * 60 * 10;
-  off_time = counter + TICKS_PER_SECOND;
+  mode_time = counter + DILD_FREQUENCY;
+  off_time = counter + DILD_DURATION;
   turn_on();
 }
 
 inline void alarm_wild() {
   switch_to_wild();
-  off_time = counter + TICKS_PER_SECOND / 4;
+  off_time = counter + WILD_DURATION;
   turn_on();
 }
 
