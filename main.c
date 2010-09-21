@@ -81,31 +81,48 @@ inline bool_t pressed(button_t *button) {
 int main(void) {
   init();
   bool_t doublepress = false;
+  bool_t longdoublepress = false;
+  uint32_t doublepress_time = 0;
 
   for(;;) {
     update_button(&button1, PINB2);
     update_button(&button2, PINB1);
 
-    if (button1.current == DOWN && button2.current == DOWN)
+    if (button1.current == DOWN && button2.current == DOWN) {
+      if (!doublepress)
+        doublepress_time = counter;
+
       doublepress = true;
+
+      if (doublepress_time + TICKS_PER_SECOND * 3 < counter) {
+        if (!longdoublepress) {
+          longdoublepress = true;
+          off_time = counter + TICKS_PER_SECOND / 8;
+          turn_on();
+        }
+      }
+    }
 
     if (doublepress) {
       if (button1.current == UP && button2.current == UP) {
-        doublepress = false;
-
-        switch (mode) {
-        case DAY: 
-          switch_to_dild();
-          break;
-        case DILD_WAITING:
-        case DILD_ACTIVE:
-          switch_to_wild();
-          break;
-        case WILD:
-          switch_to_day();
-          break;
+        if (longdoublepress) {
+          switch (mode) {
+          case DAY: 
+            switch_to_dild();
+            break;
+          case DILD_WAITING:
+          case DILD_ACTIVE:
+            switch_to_wild();
+            break;
+          case WILD:
+            switch_to_day();
+            break;
+          }
+          turn_on();
         }
-        turn_on();
+
+        doublepress = false;
+        longdoublepress = false;
       }
     } else if (pressed(&button1) || pressed(&button2)) {
       if (mode == DILD_ACTIVE || mode == DILD_WAITING) {
