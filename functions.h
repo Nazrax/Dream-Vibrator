@@ -20,7 +20,7 @@ inline void wdt_stop(void);
 inline void power_idle(void);
 inline void power_down(void);
 
-inline void turn_on(void);
+inline void turn_on(uint8_t brightness);
 inline void turn_off(void);
 
 void update_button(button_t*, button_state_t);

@@ -1,13 +1,13 @@
 #include "vibrator.h"
 
-inline void turn_on() {
+inline void turn_on(uint8_t brightness) {
   active = true;
 
-  if (mode == DILD_ACTIVE || mode == DILD_WAITING) {
+  if (brightness < 255) {
     power_timer0_enable();
     TCCR0A = _BV(COM0A1) | _BV(WGM01) | _BV(WGM00); // Fast PWM mode, inverting mode
     TCCR0B = _BV(CS00); // No prescaling
-    OCR0A = 127; // 50% duty cycle
+    OCR0A = brightness;
   } else {
     PORTB |= _BV(PORTB0);
   }
@@ -15,7 +15,7 @@ inline void turn_on() {
 
 inline void turn_off() {
   active = false;
-  if (mode == DILD_ACTIVE || mode == DILD_WAITING) {
+  if (TCCR0A) {
     TCCR0A = 0;
     TCCR0B = 0;
     power_timer0_disable();

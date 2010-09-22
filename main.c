@@ -3,36 +3,39 @@
 #define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 15)
 #define DAY_DURATION (TICKS_PER_SECOND / 4)
 #define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5)
-#define DILD_DURATION TICKS_PER_SECOND
+#define DILD_DURATION (TICKS_PER_SECOND / 2)
 #define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 10)
 #define WILD_FREQUENCY (TICKS_PER_SECOND * 45)
 #define WILD_DURATION (TICKS_PER_SECOND / 4)
+#define ALARM_DELAY (TICKS_PER_SECOND * 60 * 60 * 7 + TICKS_PER_SECOND * 60 * 20) // 7 hours 20 minutes
+#define SLEEP_DELAY (TICKS_PER_SECOND * 60 * 25)
 
 inline void switch_to_day() {
   mode = DAY;
   mode_time = counter + DAY_FREQUENCY;
   off_time = counter + TICKS_PER_SECOND / 2;
-  turn_on();
+  turn_on(FULL_POWER);
 }
 
 inline void switch_to_dild() {
   mode = DILD_WAITING;
   mode_time = counter + DILD_DELAY;
   off_time = counter + TICKS_PER_SECOND;
-  turn_on();
+  alarm_time = counter + ALARM_DELAY;
+  turn_on(FULL_POWER);
 }
 
 inline void switch_to_wild() {
   mode = WILD;
   mode_time = counter + WILD_FREQUENCY;
   off_time = counter + TICKS_PER_SECOND * 2;
-  turn_on();
+  turn_on(FULL_POWER);
 }
 
 inline void alarm_day() {
   switch_to_day();
   off_time = counter + DAY_DURATION;
-  turn_on();
+  turn_on(FULL_POWER);
 }
 
 inline void alarm_dild_waiting() {
@@ -43,13 +46,13 @@ inline void alarm_dild_waiting() {
 inline void alarm_dild_active() {
   mode_time = counter + DILD_FREQUENCY;
   off_time = counter + DILD_DURATION;
-  turn_on();
+  turn_on(QUARTER_POWER);
 }
 
 inline void alarm_wild() {
   switch_to_wild();
   off_time = counter + WILD_DURATION;
-  turn_on();
+  turn_on(FULL_POWER);
 }
 
 
@@ -94,11 +97,11 @@ int main(void) {
 
       doublepress = true;
 
-      if (doublepress_time + TICKS_PER_SECOND * 3 < counter) {
+      if (doublepress_time + TICKS_PER_SECOND * 2 < counter) {
         if (!longdoublepress) {
           longdoublepress = true;
           off_time = counter + TICKS_PER_SECOND / 8;
-          turn_on();
+          turn_on(FULL_POWER);
         }
       }
     }
@@ -118,7 +121,7 @@ int main(void) {
             switch_to_day();
             break;
           }
-          turn_on();
+          turn_on(FULL_POWER);
         }
 
         doublepress = false;
@@ -126,16 +129,20 @@ int main(void) {
       }
     } else if (pressed(&button1) || pressed(&button2)) {
       if (mode == DILD_ACTIVE || mode == DILD_WAITING) {
-        //uint32_t sleep_time = counter + TICKS_PER_SECOND * 60 * 20;
-        uint32_t sleep_time = counter + TICKS_PER_SECOND * 20;
+        uint32_t sleep_time = counter + SLEEP_DELAY;
         if (mode_time < sleep_time)
           mode_time = sleep_time;
         off_time = counter + TICKS_PER_SECOND / 4;
-        turn_on();
+        turn_on(QUARTER_POWER);
       }
     }
 
-    if (counter >= mode_time) {
+    if ((mode == DILD_ACTIVE) && (counter > alarm_time)) {
+      off_time = counter + TICKS_PER_SECOND * 5;
+      alarm_time = counter + TICKS_PER_SECOND * 30;
+      mode_time = counter + TICKS_PER_SECOND * 31; // Keep moving it past the alarm time
+      turn_on(FULL_POWER);
+    } else if (counter >= mode_time) {
       switch (mode) {
       case DAY: 
         alarm_day();

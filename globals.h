@@ -13,6 +13,10 @@
 
 #define TICKS_PER_SECOND 61L
 
+#define FULL_POWER 255
+#define HALF_POWER 128
+#define QUARTER_POWER 64
+
 typedef enum {false, true} bool_t;
 typedef enum {UP, DOWN} button_state_t;
 enum {DAY, DILD_WAITING, DILD_ACTIVE, WILD} mode;
@@ -26,7 +30,7 @@ typedef struct {
 button_t button1, button2;
 
 uint32_t counter;
-uint32_t mode_time, off_time;
+uint32_t mode_time, off_time, alarm_time;
 uint16_t ticks_per_wdt;
 
 bool_t active;
