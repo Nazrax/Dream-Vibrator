@@ -15,13 +15,10 @@ inline void turn_on(uint8_t brightness) {
 
 inline void turn_off() {
   active = false;
-  if (TCCR0A) {
-    TCCR0A = 0;
-    TCCR0B = 0;
-    power_timer0_disable();
-  } else {
-    PORTB &= ~(_BV(PORTB0));
-  }
+  TCCR0A = 0;
+  TCCR0B = 0;
+  power_timer0_disable();
+  PORTB &= ~(_BV(PORTB0));
 }
 
 void update_button(button_t *button, uint8_t pin) {
