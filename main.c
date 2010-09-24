@@ -1,14 +1,22 @@
 #include "vibrator.h"
 
-#define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 15)
+#define DAY_POWER FULL_POWER
+#define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 10)
 #define DAY_DURATION (TICKS_PER_SECOND / 4)
+
+#define DILD_POWER THIRD_POWER
+#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 5)
+#define DILD_DURATION (TICKS_PER_SECOND * 3)
 #define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5)
-#define DILD_DURATION (TICKS_PER_SECOND / 2)
-#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 10)
+
+#define WILD_POWER QUARTER_POWER
 #define WILD_FREQUENCY (TICKS_PER_SECOND * 45)
 #define WILD_DURATION (TICKS_PER_SECOND / 4)
+
 #define ALARM_DELAY (TICKS_PER_SECOND * 60 * 60 * 7 + TICKS_PER_SECOND * 60 * 20) // 7 hours 20 minutes
+
 #define SLEEP_DELAY (TICKS_PER_SECOND * 60 * 25)
+
 
 inline void switch_to_day() {
   mode = DAY;
@@ -35,7 +43,7 @@ inline void switch_to_wild() {
 inline void alarm_day() {
   switch_to_day();
   off_time = counter + DAY_DURATION;
-  turn_on(FULL_POWER);
+  turn_on(DAY_POWER);
 }
 
 inline void alarm_dild_waiting() {
@@ -46,13 +54,13 @@ inline void alarm_dild_waiting() {
 inline void alarm_dild_active() {
   mode_time = counter + DILD_FREQUENCY;
   off_time = counter + DILD_DURATION;
-  turn_on(QUARTER_POWER);
+  turn_on(DILD_POWER);
 }
 
 inline void alarm_wild() {
   switch_to_wild();
   off_time = counter + WILD_DURATION;
-  turn_on(FULL_POWER);
+  turn_on(WILD_POWER);
 }
 
 
@@ -62,7 +70,7 @@ inline void init() {
   power_all_disable();
 
   CLKPR = _BV(CLKPCE); // Enable changing the clock prescaler
-  CLKPR = _BV(CLKPS2) | _BV(CLKPS1); // Change the prescaler to 64 (125000)
+  CLKPR = _BV(CLKPS2) | _BV(CLKPS1); // Change the prescaler to 64 (125000Hz)
 
   DDRB = _BV(DDB0); // B0 is output (vibrator)
   PORTB = _BV(PORTB1) | _BV(PORTB2); // Pull up B1 and B2 (buttons)
@@ -121,7 +129,6 @@ int main(void) {
             switch_to_day();
             break;
           }
-          turn_on(FULL_POWER);
         }
 
         doublepress = false;

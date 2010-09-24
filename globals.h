@@ -15,6 +15,7 @@
 
 #define FULL_POWER 255
 #define HALF_POWER 128
+#define THIRD_POWER 85
 #define QUARTER_POWER 64
 
 typedef enum {false, true} bool_t;
