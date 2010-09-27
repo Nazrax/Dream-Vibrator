@@ -20,8 +20,11 @@ inline void wdt_stop(void);
 inline void power_idle(void);
 inline void power_down(void);
 
-inline void turn_on(uint8_t brightness);
-inline void turn_off(void);
+inline void turn_on(output_t*);
+inline void turn_off(output_t*);
+
+void set_output(output_t* output, uint16_t on_time, uint16_t off_time, uint16_t delay, uint8_t times, uint8_t brightness, bool_t repeat);
+void handle_output(output_t* output);
 
 void update_button(button_t*, button_state_t);
 

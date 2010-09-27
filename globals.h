@@ -20,7 +20,9 @@
 
 typedef enum {false, true} bool_t;
 typedef enum {UP, DOWN} button_state_t;
-enum {DAY, DILD_WAITING, DILD_ACTIVE, WILD} mode;
+typedef enum {OFF, ON, WAITING} output_state_t;
+enum {DAY, DILD_WAITING, DILD_ACTIVE, WILD, ALARM} mode;
+enum {NORMAL, SETTING} main_mode;
 enum {SLOW, FAST} timer;
 
 typedef struct {
@@ -28,13 +30,22 @@ typedef struct {
   uint32_t time, down_time;
 } button_t;
 
-button_t button1, button2;
+typedef struct {
+  uint8_t port, brightness;
+  int8_t times, repeat;
+  uint16_t on_time, off_time, delay;
+  bool_t has_timer;
+  uint32_t count_from;
+  output_state_t state;
+} output_t;
 
-uint32_t counter;
-uint32_t mode_time, off_time, alarm_time;
+button_t button1, button2;
+output_t vibrator;
+
+volatile uint32_t counter;
+uint32_t count_to, alarm_count_to;
 uint16_t ticks_per_wdt;
 
-bool_t active;
 bool_t calibrating;
 
 #endif

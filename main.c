@@ -1,49 +1,49 @@
 #include "vibrator.h"
 
 #define DAY_POWER FULL_POWER
-#define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 10)
-#define DAY_DURATION (TICKS_PER_SECOND / 4)
+#define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 10) // 10 minutes
+#define DAY_DURATION (TICKS_PER_SECOND / 4) // 1/4 second
 
 #define DILD_POWER THIRD_POWER
-#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 5)
-#define DILD_DURATION (TICKS_PER_SECOND * 3)
-#define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5)
+#define DILD_DURATION (TICKS_PER_SECOND * 5) // 5 seconds
+#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 5) // 5 minutes
+//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5) // 5 hours
+#define DILD_DELAY (TICKS_PER_SECOND * 60 * 90) // 1.5 hours
 
 #define WILD_POWER QUARTER_POWER
-#define WILD_FREQUENCY (TICKS_PER_SECOND * 45)
-#define WILD_DURATION (TICKS_PER_SECOND / 4)
+#define WILD_FREQUENCY (TICKS_PER_SECOND * 45) // 45 seconds
+#define WILD_DURATION (TICKS_PER_SECOND / 4) // 1/4 second
 
-#define ALARM_DELAY (TICKS_PER_SECOND * 60 * 60 * 7 + TICKS_PER_SECOND * 60 * 20) // 7 hours 20 minutes
+#define ALARM_DELAY (TICKS_PER_SECOND * 60 * 60 * 7 + 60 * 20) // 7 hours 20 minutes
 
-#define SLEEP_DELAY (TICKS_PER_SECOND * 60 * 25)
+#define SLEEP_DELAY (TICKS_PER_SECOND * 60 * 25) // 25 minutes
 
+#define MODE_CHANGE_TIME (.5 * TICKS_PER_SECOND)
+
+#define SETTINGS_TIMEOUT (TICKS_PER_SECOND * 10)
 
 inline void switch_to_day() {
   mode = DAY;
-  mode_time = counter + DAY_FREQUENCY;
-  off_time = counter + TICKS_PER_SECOND / 2;
-  turn_on(FULL_POWER);
+  count_to = counter + DAY_FREQUENCY;
+  set_output(&vibrator, MODE_CHANGE_TIME, MODE_CHANGE_TIME, 0, 1, FULL_POWER, false);
 }
 
 inline void switch_to_dild() {
   mode = DILD_WAITING;
-  mode_time = counter + DILD_DELAY;
-  off_time = counter + TICKS_PER_SECOND;
-  alarm_time = counter + ALARM_DELAY;
-  turn_on(FULL_POWER);
+  count_to = counter + DILD_DELAY;
+  alarm_count_to = counter + ALARM_DELAY;
+  set_output(&vibrator, MODE_CHANGE_TIME, MODE_CHANGE_TIME, 0, 2, FULL_POWER, false);
 }
 
 inline void switch_to_wild() {
   mode = WILD;
-  mode_time = counter + WILD_FREQUENCY;
-  off_time = counter + TICKS_PER_SECOND * 2;
-  turn_on(FULL_POWER);
+  count_to = counter + WILD_FREQUENCY;
+  set_output(&vibrator, MODE_CHANGE_TIME, MODE_CHANGE_TIME, 0, 4, FULL_POWER, false);
 }
 
 inline void alarm_day() {
-  switch_to_day();
-  off_time = counter + DAY_DURATION;
-  turn_on(DAY_POWER);
+  count_to = counter + DAY_FREQUENCY;
+  set_output(&vibrator, DAY_DURATION, DAY_DURATION, 0, 1, DAY_POWER, false);
 }
 
 inline void alarm_dild_waiting() {
@@ -52,15 +52,13 @@ inline void alarm_dild_waiting() {
 }
 
 inline void alarm_dild_active() {
-  mode_time = counter + DILD_FREQUENCY;
-  off_time = counter + DILD_DURATION;
-  turn_on(DILD_POWER);
+  count_to = counter + DILD_FREQUENCY;
+  set_output(&vibrator, DILD_DURATION, DILD_DURATION, 0, 1, DILD_POWER, false);
 }
 
 inline void alarm_wild() {
-  switch_to_wild();
-  off_time = counter + WILD_DURATION;
-  turn_on(WILD_POWER);
+  count_to = counter + WILD_FREQUENCY;
+  set_output(&vibrator, WILD_DURATION, WILD_DURATION, 0, 1, WILD_POWER, false);
 }
 
 
@@ -69,6 +67,10 @@ inline void init() {
   wdt_stop();
   power_all_disable();
 
+  // Setup outputs
+  vibrator.has_timer = true;
+  vibrator.port = PORTB0;
+
   CLKPR = _BV(CLKPCE); // Enable changing the clock prescaler
   CLKPR = _BV(CLKPS2) | _BV(CLKPS1); // Change the prescaler to 64 (125000Hz)
 
@@ -76,9 +78,12 @@ inline void init() {
   PORTB = _BV(PORTB1) | _BV(PORTB2); // Pull up B1 and B2 (buttons)
   mode = DAY;
 
+  /*
   PORTB ^= _BV(PORTB0);
-  _delay_ms(1000);
-
+  _delay_ms(500);
+  PORTB &= ~(_BV(PORTB0));
+  _delay_ms(500);
+  */
   sei();
 
   //calibrate_wdt();
@@ -91,6 +96,7 @@ inline bool_t pressed(button_t *button) {
 
 int main(void) {
   init();
+
   bool_t doublepress = false;
   bool_t longdoublepress = false;
   uint32_t doublepress_time = 0;
@@ -108,8 +114,7 @@ int main(void) {
       if (doublepress_time + TICKS_PER_SECOND * 2 < counter) {
         if (!longdoublepress) {
           longdoublepress = true;
-          off_time = counter + TICKS_PER_SECOND / 8;
-          turn_on(FULL_POWER);
+          set_output(&vibrator, .125, .125, 0, 1, FULL_POWER, false);
         }
       }
     }
@@ -123,6 +128,7 @@ int main(void) {
             break;
           case DILD_WAITING:
           case DILD_ACTIVE:
+          case ALARM:
             switch_to_wild();
             break;
           case WILD:
@@ -137,21 +143,20 @@ int main(void) {
     } else if (pressed(&button1) || pressed(&button2)) {
       if (mode == DILD_ACTIVE || mode == DILD_WAITING) {
         uint32_t sleep_time = counter + SLEEP_DELAY;
-        if (mode_time < sleep_time)
-          mode_time = sleep_time;
-        off_time = counter + TICKS_PER_SECOND / 4;
-        turn_on(QUARTER_POWER);
+
+        if (count_to < sleep_time)
+          count_to = sleep_time;
+
+        set_output(&vibrator, TICKS_PER_SECOND / 4, TICKS_PER_SECOND / 4, 0, 1, QUARTER_POWER, false);
       }
     }
 
-    if ((mode == DILD_ACTIVE) && (counter > alarm_time)) {
-      off_time = counter + TICKS_PER_SECOND * 5;
-      alarm_time = counter + TICKS_PER_SECOND * 30;
-      mode_time = counter + TICKS_PER_SECOND * 31; // Keep moving it past the alarm time
-      turn_on(FULL_POWER);
-    } else if (counter >= mode_time) {
+    if ((mode == DILD_ACTIVE) && (counter > alarm_count_to)) {
+      mode = ALARM;
+      set_output(&vibrator, 5, 30, 0, 50, FULL_POWER, true);
+    } else if (counter > count_to) {
       switch (mode) {
-      case DAY: 
+      case DAY:
         alarm_day();
         break;
       case DILD_WAITING:
@@ -163,13 +168,15 @@ int main(void) {
       case WILD:
         alarm_wild();
         break;
+      case ALARM:
+        break;
       }
-    } else if (active && counter > off_time) {
-      turn_off();
-    }
+    } 
 
     button1.old = button1.current;
     button2.old = button2.current;
+
+    handle_output(&vibrator);
   }
 
   return 0;
