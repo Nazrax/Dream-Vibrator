@@ -121,7 +121,7 @@ CC=avr-gcc
 OBJCOPY=avr-objcopy
 OBJDUMP=avr-objdump
 SIZE=avr-size
-AVRDUDE=avrdude -B15
+AVRDUDE=avrdude #-B15
 REMOVE=rm -f
 
 ##### automatic target names ####

@@ -82,12 +82,11 @@ inline void init() {
   mode = DAY;
   count_to = counter + DAY_FREQUENCY;
 
-  /*
   PORTB ^= _BV(PORTB0);
   _delay_ms(500);
   PORTB &= ~(_BV(PORTB0));
   _delay_ms(500);
-  */
+
   sei();
 
   //calibrate_wdt();
