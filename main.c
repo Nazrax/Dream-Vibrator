@@ -78,7 +78,9 @@ inline void init() {
 
   DDRB = _BV(DDB0); // B0 is output (vibrator)
   PORTB = _BV(PORTB1) | _BV(PORTB2); // Pull up B1 and B2 (buttons)
+  
   mode = DAY;
+  count_to = counter + DAY_FREQUENCY;
 
   /*
   PORTB ^= _BV(PORTB0);
@@ -181,7 +183,7 @@ int main(void) {
       }
     }
 
-    if (mode == NORMAL) {
+    if (main_mode == NORMAL) {
       if ((mode == DILD_ACTIVE) && (counter > alarm_count_to)) {
         mode = ALARM;
         set_output(&vibrator, 5, 30, 0, 50, FULL_POWER, true);
