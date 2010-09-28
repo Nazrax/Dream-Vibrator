@@ -18,6 +18,8 @@
 #define THIRD_POWER 85
 #define QUARTER_POWER 64
 
+uint8_t dild_power;
+
 typedef enum {false, true} bool_t;
 typedef enum {UP, DOWN} button_state_t;
 typedef enum {OFF, ON, WAITING} output_state_t;
