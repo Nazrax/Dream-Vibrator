@@ -2,12 +2,13 @@
 
 #define DAY_POWER FULL_POWER
 #define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 10) // 10 minutes
-#define DAY_DURATION (TICKS_PER_SECOND / 4) // 1/4 second
+#define DAY_DURATION (TICKS_PER_SECOND / 2) // 1/4 second
 
-#define DILD_DURATION (TICKS_PER_SECOND * 5) // 5 seconds
-#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 5) // 5 minutes
-//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5) // 5 hours
-#define DILD_DELAY (TICKS_PER_SECOND * 60 * 90) // 1.5 hours
+#define DILD_DURATION (TICKS_PER_SECOND * 4) // 5 seconds
+#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 8) // 5 minutes
+#define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5) // 5 hours
+//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 90) // 1.5 hours
+//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 30) // .5 hours
 
 #define WILD_POWER QUARTER_POWER
 #define WILD_FREQUENCY (TICKS_PER_SECOND * 45) // 45 seconds
