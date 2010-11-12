@@ -207,7 +207,7 @@ int main(void) {
           if (count_to < sleep_time)
             count_to = sleep_time;
 
-          set_output(&vibrator, TICKS_PER_SECOND / 4, TICKS_PER_SECOND / 4, 0, 1, QUARTER_POWER, false);
+          set_output(&vibrator, TICKS_PER_SECOND / 4, TICKS_PER_SECOND / 4, 0, 1, HALF_POWER, false);
         }
       }
     }
