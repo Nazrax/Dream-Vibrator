@@ -84,8 +84,14 @@ inline void alarm_dild_active() {
 }
 
 inline void alarm_wild() {
+  /*
   count_to = counter + WILD_FREQUENCY;
   set_output(&vibrator, WILD_DURATION, WILD_DURATION, 0, 1, WILD_POWER, false);
+  */
+
+  // Temporary - put here to help find the right power / timing
+  count_to = counter + 10 * TICKS_PER_SECOND;
+  set_output(&vibrator, DILD_DURATION, DILD_DURATION, 0, 1, dild_power, false);
 }
 
 
