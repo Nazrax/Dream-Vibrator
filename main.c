@@ -48,11 +48,18 @@ inline void switch_to_day() {
   set_output(&vibrator, MODE_CHANGE_TIME, MODE_CHANGE_TIME, 0, 1, FULL_POWER, false);
 }
 
-inline void switch_to_dild() {
+inline void switch_to_dild_waiting() {
   mode = DILD_WAITING;
   count_to = counter + DILD_DELAY;
   alarm_count_to = counter + ALARM_DELAY;
   set_output(&vibrator, MODE_CHANGE_TIME, MODE_CHANGE_TIME, 0, 2, FULL_POWER, false);
+}
+
+inline void switch_to_dild_active() {
+  mode = DILD_ACTIVE;
+  count_to = counter + SLEEP_DELAY;
+  alarm_count_to = counter + ALARM_DELAY;
+  set_output(&vibrator, MODE_CHANGE_TIME, MODE_CHANGE_TIME, 0, 3, FULL_POWER, false);
 }
 
 inline void switch_to_wild() {
@@ -158,11 +165,13 @@ int main(void) {
         } else if (longdoublepress) {
           switch (mode) {
           case DAY: 
-            switch_to_dild();
+            switch_to_dild_waiting();
             break;
           case DILD_WAITING:
-          case DILD_ACTIVE:
           case ALARM:
+            switch_to_dild_active();
+            break;
+          case DILD_ACTIVE:
             switch_to_wild();
             break;
           case WILD:

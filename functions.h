@@ -3,7 +3,8 @@
 
 
 inline void switch_to_day(void);
-inline void switch_to_dild(void);
+inline void switch_to_dild_waiting(void);
+inline void switch_to_dild_active(void);
 inline void switch_to_wild(void);
 
 inline void alarm_day(void);
