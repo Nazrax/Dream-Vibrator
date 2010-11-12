@@ -30,8 +30,8 @@
 #define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 10) // 10 minutes
 
 #define SLEEP_DELAY (TICKS_PER_SECOND * 60 * 25) // 25 minutes
-#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 8) // 5 minutes
-#define DILD_DURATION (TICKS_PER_SECOND * 4) // 4 seconds
+#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 15) // 15 minutes
+#define DILD_DURATION (TICKS_PER_SECOND * 2) // 2 seconds
 //#define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5) // 5 hours
 #define DILD_DELAY (TICKS_PER_SECOND * 60 * 150) // 2.5 hours
 //#define DILD_DELAY (TICKS_PER_SECOND * 60 * 90) // 1.5 hours
