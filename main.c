@@ -105,7 +105,7 @@ inline void init() {
   CLKPR = _BV(CLKPS2) | _BV(CLKPS1); // Change the prescaler to 64 (125000Hz)
 
   DDRB = _BV(DDB0); // B0 is output (vibrator)
-  PORTB = _BV(PORTB1) | _BV(PORTB2); // Pull up B1 and B2 (buttons)
+  PORTB = _BV(PORTB3) | _BV(PORTB4); // Pull up B3 and B4 (buttons)
   
   mode = DAY;
   count_to = counter + DAY_FREQUENCY;
@@ -135,8 +135,8 @@ int main(void) {
   uint8_t button_count = 0;
 
   for(;;) {
-    update_button(&button1, PINB2);
-    update_button(&button2, PINB1);
+    update_button(&button1, PINB4);
+    update_button(&button2, PINB3);
 
     if (button1.current == DOWN && button2.current == DOWN) {
       if (!doublepress)
