@@ -77,6 +77,11 @@ AVRDUDE_PORT=/dev/stk500
 
 ##### Flags ####
 
+ifdef DEBUG
+ DDEBUG=-DDEBUG
+endif
+
+
 # HEXFORMAT -- format for .hex file output
 HEXFORMAT=ihex
 
@@ -92,14 +97,18 @@ CFLAGS=-I. $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) \
 	-funsigned-bitfields -funsigned-char    \
 	-Wall -Wstrict-prototypes -Werror       \
 	-Wa,-ahlms=$(firstword                  \
-	$(filter %.lst, $(<:.c=.lst))) $(CTUNE)
+	$(filter %.lst, $(<:.c=.lst))) $(CTUNE) \
+	$(DDEBUG)
+
+
 
 # c++ specific flags
 CPPFLAGS=-fno-exceptions               \
 	-Wa,-ahlms=$(firstword         \
 	$(filter %.lst, $(<:.cpp=.lst))\
 	$(filter %.lst, $(<:.cc=.lst)) \
-	$(filter %.lst, $(<:.C=.lst)))
+	$(filter %.lst, $(<:.C=.lst))) \
+	$(DDEBUG)
 
 # assembler
 ASMFLAGS =-I. $(INC) -mmcu=$(MCU)        \

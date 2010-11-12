@@ -1,26 +1,46 @@
 #include "vibrator.h"
 
 #define DAY_POWER FULL_POWER
-#define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 10) // 10 minutes
 #define DAY_DURATION (TICKS_PER_SECOND / 2) // 1/4 second
 
-#define DILD_DURATION (TICKS_PER_SECOND * 4) // 5 seconds
-#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 8) // 5 minutes
-#define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5) // 5 hours
-//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 90) // 1.5 hours
-//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 30) // .5 hours
-
 #define WILD_POWER QUARTER_POWER
-#define WILD_FREQUENCY (TICKS_PER_SECOND * 45) // 45 seconds
 #define WILD_DURATION (TICKS_PER_SECOND / 4) // 1/4 second
-
-#define ALARM_DELAY (TICKS_PER_SECOND * 60 * 60 * 7 + 60 * 20) // 7 hours 20 minutes
-
-#define SLEEP_DELAY (TICKS_PER_SECOND * 60 * 25) // 25 minutes
 
 #define MODE_CHANGE_TIME (TICKS_PER_SECOND / 4)
 
 #define SETTINGS_TIMEOUT (TICKS_PER_SECOND * 10)
+
+//#define ALARM_DELAY (TICKS_PER_SECOND * 60 * 60 * 7 + 60 * 20) // 7 hours 20 minutes
+#define ALARM_DELAY (TICKS_PER_SECOND * 60 * 60 * 8 + 60 * 50) // 8 hours 50 minutes
+
+
+#ifdef DEBUG
+
+#define DAY_FREQUENCY (TICKS_PER_SECOND *  10) // 10 seconds
+
+#define DILD_FREQUENCY (TICKS_PER_SECOND * 5) // 5 seconds
+#define DILD_DELAY (TICKS_PER_SECOND * 15) // 15 seconds
+#define DILD_DURATION (TICKS_PER_SECOND * 1) // 1 second
+#define SLEEP_DELAY (TICKS_PER_SECOND * 10) // 10 seconds
+
+#define WILD_FREQUENCY (TICKS_PER_SECOND * 15) // 45 seconds
+
+#else // ELSE
+
+#define DAY_FREQUENCY (TICKS_PER_SECOND * 60 * 10) // 10 minutes
+
+#define SLEEP_DELAY (TICKS_PER_SECOND * 60 * 25) // 25 minutes
+#define DILD_FREQUENCY (TICKS_PER_SECOND * 60 * 8) // 5 minutes
+#define DILD_DURATION (TICKS_PER_SECOND * 4) // 4 seconds
+//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 60 * 5) // 5 hours
+#define DILD_DELAY (TICKS_PER_SECOND * 60 * 150) // 2.5 hours
+//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 90) // 1.5 hours
+//#define DILD_DELAY (TICKS_PER_SECOND * 60 * 30) // .5 hours
+
+#define WILD_FREQUENCY (TICKS_PER_SECOND * 45) // 45 seconds
+
+#endif
+
 
 inline void switch_to_day() {
   mode = DAY;
